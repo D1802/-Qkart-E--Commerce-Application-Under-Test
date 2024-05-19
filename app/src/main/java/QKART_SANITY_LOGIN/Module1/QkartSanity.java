@@ -3,37 +3,26 @@
  */
 package QKART_SANITY_LOGIN.Module1;
 
-import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 public class QkartSanity {
 
     public static String lastGeneratedUserName;
 
 
-    public static RemoteWebDriver createDriver() throws MalformedURLException {
+    public static ChromeDriver createDriver() throws MalformedURLException {
         // Launch Browser using Zalenium
-        final DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setBrowserName(BrowserType.CHROME);
-        RemoteWebDriver driver = new RemoteWebDriver(new URL("http://localhost:8082/wd/hub"), capabilities);
-
+        // final DesiredCapabilities capabilities = new DesiredCapabilities();
+        // capabilities.setBrowserName(BrowserType.CHROME);
+        // ChromeDriver driver = new ChromeDriver(new URL("http://localhost:8082/wd/hub"), capabilities);
+        ChromeDriver driver = new ChromeDriver();
         return driver;
     }
 
@@ -57,7 +46,7 @@ public class QkartSanity {
     /*
      * Testcase01: Verify the functionality of Login button on the Home page
      */
-    public static Boolean TestCase01(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase01(ChromeDriver driver) throws InterruptedException {
         Boolean status;
         logStatus("Start TestCase", "Test Case 1: Verify User Registration", "DONE");
 
@@ -94,7 +83,7 @@ public class QkartSanity {
     /*
      * Verify that an existing user is not allowed to re-register on QKart
      */
-    public static Boolean TestCase02(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase02(ChromeDriver driver) throws InterruptedException {
         Boolean status;
         logStatus("Start Testcase", "Test Case 2: Verify User Registration with an existing username ", "DONE");
 
@@ -120,7 +109,7 @@ public class QkartSanity {
     /*
      * Verify the functinality of the search text box
      */
-    public static Boolean TestCase03(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase03(ChromeDriver driver) throws InterruptedException {
         logStatus("TestCase 3", "Start test case : Verify functionality of search box ", "DONE");
         boolean status;
 
@@ -181,7 +170,7 @@ public class QkartSanity {
      * Verify the presence of size chart and check if the size chart content is as
      * expected
      */
-    public static Boolean TestCase04(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase04(ChromeDriver driver) throws InterruptedException {
         logStatus("TestCase 4", "Start test case : Verify the presence of size Chart", "DONE");
         boolean status = false;
 
@@ -235,7 +224,7 @@ public class QkartSanity {
      * Verify the complete flow of checking out and placing order for products is
      * working correctly
      */
-    public static Boolean TestCase05(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase05(ChromeDriver driver) throws InterruptedException {
         Boolean status;
         logStatus("Start TestCase", "Test Case 5: Verify Happy Flow of buying products", "DONE");
 
@@ -289,17 +278,32 @@ public class QkartSanity {
     /*
      * Verify the quantity of items in cart can be updated
      */
-    public static Boolean TestCase06(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase06(ChromeDriver driver) throws InterruptedException {
         Boolean status;
         logStatus("Start TestCase", "Test Case 6: Verify that cart can be edited", "DONE");
         Home homePage = new Home(driver);
         Register registration = new Register(driver);
         Login login = new Login(driver);
+        registration.navigateToRegisterPage();
+        status = registration.registerUser("testUser", "abc@123", true);
+        if (!status) {
+            logStatus("Step Failure", "User Perform Register Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase", "Test Case 6:  Verify that cart can be edited: ", status ? "PASS" : "FAIL");
+            return false;
+        }
+        lastGeneratedUserName = registration.lastGeneratedUsername;
+
+        login.navigateToLoginPage();
+        status = login.PerformLogin(lastGeneratedUserName, "abc@123");
+        if (!status) {
+            logStatus("Step Failure", "User Perform Login Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase", "Test Case 6:  Verify that cart can be edited: ", status ? "PASS" : "FAIL");
+            return false;
+        }
 
 
 
-
-
+        homePage.navigateToHome();
 
         homePage.changeProductQuantityinCart("Xtend Smart Watch", 2);
 
@@ -327,7 +331,7 @@ public class QkartSanity {
     }
 
 
-    public static Boolean TestCase07(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase07(ChromeDriver driver) throws InterruptedException {
         Boolean status;
         logStatus("Start TestCase",
                 "Test Case 7: Verify that insufficient balance error is thrown when the wallet balance is not enough",
@@ -382,23 +386,23 @@ public class QkartSanity {
         return status;
     }
 
-    public static Boolean TestCase08(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase08(ChromeDriver driver) throws InterruptedException {
         Boolean status = false;
 
         return status;
     }
 
-    public static Boolean TestCase9(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase9(ChromeDriver driver) throws InterruptedException {
         Boolean status = false;
         return status;
     }
 
-    public static Boolean TestCase10(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase10(ChromeDriver driver) throws InterruptedException {
         Boolean status = false;
         return status;
     }
 
-    public static Boolean TestCase11(RemoteWebDriver driver) throws InterruptedException {
+    public static Boolean TestCase11(ChromeDriver driver) throws InterruptedException {
         Boolean status = false;
         return status;
     }
@@ -407,6 +411,8 @@ public class QkartSanity {
         int totalTests = 0;
         int passedTests = 0;
         Boolean status;
+
+        ChromeDriver driver = createDriver();
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
